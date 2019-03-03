@@ -17,4 +17,5 @@ interface MainActivityService {
     fun stopAllJobs()
 
     fun startAllJobs()
+    fun isConnected(): Boolean
 }

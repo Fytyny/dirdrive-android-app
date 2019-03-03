@@ -12,10 +12,7 @@ import org.fytyny.dirdriveandroid.util.Session
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import java.util.*
-import java.util.concurrent.Callable
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 import javax.inject.Inject
 import javax.inject.Singleton
 import javax.ws.rs.core.HttpHeaders
@@ -55,7 +52,7 @@ class DirDriveClientImpl @Inject constructor() : DirDriveClient{
         try{
             executor.connect("http://192.168.1.214:8080", JsoupRequest())
             return true
-        }catch (e :RuntimeException){
+        }catch (e : ExecutionException){
             return false
         }
     }

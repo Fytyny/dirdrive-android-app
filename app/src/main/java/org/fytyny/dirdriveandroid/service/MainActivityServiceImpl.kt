@@ -30,6 +30,11 @@ class MainActivityServiceImpl constructor(val mainActivity: MainActivity) : Main
         val CONFIG_NAME: String = "config.json"
     }
 
+    override fun isConnected() : Boolean{
+        if (component == null) return false
+        return component!!.getClient().establishConnection()
+    }
+
     @Synchronized
     override fun getDirectories(): Map<DirectoryDTO, String?> {
         if (map != null) return this.map!!;
@@ -92,7 +97,7 @@ class MainActivityServiceImpl constructor(val mainActivity: MainActivity) : Main
             persistableBundle.putString(DriveJob.DIR_SERVER_PATH, dir.path)
             persistableBundle.putString(DriveJob.DIR_LOCAL_PATH, path)
             val build = JobInfo.Builder(getIdOfDir(dir), componentName).setPeriodic(900)
-                    //   .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                       .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
                  // .setMinimumLatency(324)
                     .setPersisted(true)
                     .setExtras(persistableBundle)

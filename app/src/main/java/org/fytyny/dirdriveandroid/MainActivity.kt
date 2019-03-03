@@ -49,27 +49,42 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        startService()
-        activityService!!.refreshDirectories()
-        setNewTextSummary()
-        checkPermission(Manifest.permission.INTERNET, REQUEST_INTERNET)
-        checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_WRITE_EXTERNAL_STORAGE)
-        checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_READ_EXTERNAL_STORAGE)
+        val b1 = checkPermission(Manifest.permission.INTERNET, REQUEST_INTERNET)
+        val b2 = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_WRITE_EXTERNAL_STORAGE)
+        val b3 = checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_READ_EXTERNAL_STORAGE)
+        if (b1 && b2 && b3){
+            startService()
+            if (activityService!!.isConnected()) {
+                activityService!!.refreshDirectories()
+                setNewTextSummary()
+            } else {
+                setNewTextError()
+            }
+        }
 
         fab.setOnClickListener { view ->
-            val proto = Intent(this, ServerDirectoryChooserActivity::class.java)
-            proto.putStringArrayListExtra(ServerDirectoryChooserActivity.SEREVER_LABELS, ArrayList(activityService!!.getDirectories().keys.map { it -> it.label }.toList()))
-            startActivityForResult(proto, 9998)
+            if (activityService == null) startService()
+            if (activityService!!.isConnected()) {
+                val proto = Intent(this, ServerDirectoryChooserActivity::class.java)
+                proto.putStringArrayListExtra(ServerDirectoryChooserActivity.SEREVER_LABELS, ArrayList(activityService!!.getDirectories().keys.map { it -> it.label }.toList()))
+                startActivityForResult(proto, 9998)
+            }
         }
     }
 
-    fun checkPermission(permission : String, requestCode: Int){
+    private fun setNewTextError() {
+        summary.text = "Failed to establish connection"
+    }
+
+    fun checkPermission(permission : String, requestCode: Int) : Boolean{
         if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED){
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,permission)) {
             } else {
                 ActivityCompat.requestPermissions(this,arrayOf(permission),requestCode)
             }
+            return false
         }
+        return true
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -124,8 +139,12 @@ class MainActivity : AppCompatActivity() {
 
     fun refreshOnClick(v : View){
         if(activityService == null) startService()
-        activityService!!.refreshDirectories()
-        setNewTextSummary()
+        if (activityService!!.isConnected()) {
+            activityService!!.refreshDirectories()
+            setNewTextSummary()
+        }else{
+            setNewTextError()
+        }
     }
 
     fun setNewTextSummary(){
