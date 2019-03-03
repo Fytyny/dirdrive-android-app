@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
+
+    <android.support.design.widget.AppBarLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:background="?attr/colorPrimary"
+            android:theme="@style/AppTheme">
+
+        <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:popupTheme="@style/AppTheme"/>
+
+    </android.support.design.widget.AppBarLayout>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:layout_marginLeft="12dp"
+            android:shadowDx="14"
+            android:textSize="50sp"
+            android:text="DirDrive"/>
+
+    <include
+            layout="@layout/content_main"
+            android:id="@+id/include"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="-80dp"
+            android:alpha="0.1"
+            android:textSize="120sp"
+            android:text="DirDrive"
+            app:layout_anchorGravity="top|center"
+            app:layout_anchor="@+id/include"/>
+
+    <include layout="@layout/content_main"/>
+    <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:theme="@style/AppTheme"
+            app:srcCompat="@android:drawable/ic_input_add"/>
+
+    <TextView
+            android:id="@+id/summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="100dp"
+            android:textSize="15sp"
+            android:text="Found: ?F, Mapped: ?M"
+            />
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="200dp"
+            android:layout_gravity="center"
+            android:textSize="30sp"
+            android:onClick="refreshOnClick"
+            android:text="Refresh"/>
+</android.support.design.widget.CoordinatorLayout>
