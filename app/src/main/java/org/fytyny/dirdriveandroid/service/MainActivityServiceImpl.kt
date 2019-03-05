@@ -4,13 +4,17 @@ import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import android.os.PersistableBundle
+import android.support.v4.content.ContextCompat
 import android.util.Log
 import org.fytyny.dirdrive.api.dto.DirectoryDTO
 import org.fytyny.dirdriveandroid.MainActivity
 import org.fytyny.dirdriveandroid.annotation.Mockable
 import org.fytyny.dirdriveandroid.component.DaggerDefaultComponent
 import org.fytyny.dirdriveandroid.component.DefaultComponent
+import org.fytyny.dirdriveandroid.job.DriveIntentJob
 import org.fytyny.dirdriveandroid.job.DriveJob
 import org.fytyny.dirdriveandroid.job.DriveRunnable
 import org.fytyny.dirdriveandroid.util.DirectoryMapper
@@ -88,7 +92,6 @@ class MainActivityServiceImpl constructor(val mainActivity: MainActivity) : Main
     override fun startJobForDir(dir: DirectoryDTO) {
         val path = map?.get(dir)
         if (path != null) {
-            val driveJob = DriveJob()
             val jobScheduler = mainActivity.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
             val componentName = ComponentName(mainActivity, DriveJob::class.java)
             val persistableBundle: PersistableBundle = PersistableBundle()
@@ -97,7 +100,7 @@ class MainActivityServiceImpl constructor(val mainActivity: MainActivity) : Main
             persistableBundle.putString(DriveJob.DIR_SERVER_PATH, dir.path)
             persistableBundle.putString(DriveJob.DIR_LOCAL_PATH, path)
             val build = JobInfo.Builder(getIdOfDir(dir), componentName).setPeriodic(900)
-                       .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                     //  .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
                  // .setMinimumLatency(324)
                     .setPersisted(true)
                     .setExtras(persistableBundle)
@@ -108,6 +111,25 @@ class MainActivityServiceImpl constructor(val mainActivity: MainActivity) : Main
             } else {
                 Log.i("job", "Job not scheduled");
             }
+        }
+    }
+
+    override fun startJobOnlyOnce(dir: DirectoryDTO){
+        val path = map?.get(dir)
+        if (path != null) {
+            val driveJob = DriveJob()
+            val jobScheduler = mainActivity.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+            val componentName = ComponentName(mainActivity, DriveJob::class.java)
+            val persistableBundle: Bundle = Bundle()
+
+            persistableBundle.putString(DriveJob.DIR_SERVER_LABEL, dir.label)
+            persistableBundle.putString(DriveJob.DIR_SERVER_PATH, dir.path)
+            persistableBundle.putString(DriveJob.DIR_LOCAL_PATH, path)
+
+            val intent = Intent(mainActivity,DriveIntentJob::class.java)
+            intent.putExtras(persistableBundle)
+            ContextCompat.startForegroundService(mainActivity,intent)
+            DriveIntentJob.enqueue(this.mainActivity,intent,getIdOfDir(dir))
         }
     }
 
@@ -124,5 +146,13 @@ class MainActivityServiceImpl constructor(val mainActivity: MainActivity) : Main
         for(dir in map!!.keys){
             startJobForDir(dir)
         }
+    }
+
+    override fun jobsScheduled(): Int {
+        val jobScheduler = mainActivity.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        if (jobScheduler != null){
+            return jobScheduler.allPendingJobs.size
+        }
+        return 0
     }
 }

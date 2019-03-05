@@ -1,5 +1,6 @@
 package org.fytyny.dirdriveandroid.client
 
+import android.util.Log
 import org.fytyny.dirdriveandroid.util.Session
 import org.jsoup.Connection
 import org.jsoup.Jsoup
@@ -35,10 +36,13 @@ class HttpExecutorImpl @Inject constructor() : HttpExecutor{
                         .execute()
             }
         }
-
+        Log.i(this.javaClass.name, "Started " + url)
         val submit = executor.submit(c)
-        executor.shutdown();
-        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
-        return submit.get();
+   //     executor.shutdown();
+ //       executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
+
+         val get = submit.get()
+        Log.i(this.javaClass.name, "Finished " + url + " " + (get != null))
+        return get;
     }
 }

@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.HashSet
 
-class DriveRunnable (val source : DirectoryDTO,  val destinationPath : String) : Runnable {
+class DriveRunnable (val source : DirectoryDTO,  val destinationPath : String, val logging : DriveJobLogging) : Runnable {
 
     companion object {
         fun destinationFileDTOList(path : String) : List<FileDTO> {
@@ -56,20 +56,26 @@ class DriveRunnable (val source : DirectoryDTO,  val destinationPath : String) :
     var component : DefaultComponent? = null
 
     override fun run() {
+        logging.log("Job started");
+        logging.log("Job started");
         component = DaggerDefaultComponent.create();
         val client = component!!.getClient()
         if (!client.establishConnection()){
-            Log.e(this.javaClass.name,"Could not establish connection")
+            logging.log("Could not establish connection")
             return
         }
         val files = client.getFiles(source)
         var destination = destinationFileDTOList(destinationPath)
         val filesToRemove = getFilesToRemove(files, destination)
+        logging.log("Removing " + filesToRemove.size);
         removeFiles(filesToRemove, destinationPath)
 
         destination = destinationFileDTOList(destinationPath)
         val filesToDownload = getFilesToDownload(files, destination)
+
+        logging.log("Downloading " + filesToDownload.size + " in " + source.label);
         downloadFiles(filesToDownload, destinationPath)
+        logging.log("Job finished");
 
     }
 
@@ -77,8 +83,9 @@ class DriveRunnable (val source : DirectoryDTO,  val destinationPath : String) :
 
         val client = component!!.getClient()
         val dateTimeFormatter = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
-
+        var i : Int = 0
         for (fD : FileDTO in filesToDownload){
+            logging.log("Downloading " + (++i) + "/" + filesToDownload.size + " in " + source.label);
             val fr = FileRequest()
             val file : File = File(destinationPath + File.separator + fD.name)
             fr.directoryDTO = source

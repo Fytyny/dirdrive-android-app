@@ -18,4 +18,7 @@ interface MainActivityService {
 
     fun startAllJobs()
     fun isConnected(): Boolean
+
+    fun jobsScheduled(): Int
+    fun startJobOnlyOnce(dir: DirectoryDTO)
 }

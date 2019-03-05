@@ -34,9 +34,9 @@ class MainActivity : AppCompatActivity() {
     companion object {
         val REQUEST_WRITE_EXTERNAL_STORAGE = 2023
         val REQUEST_READ_EXTERNAL_STORAGE = 2022
-
+        val REQUEST_IGNORE_BATTERY_OPT = 2020
     }        val REQUEST_INTERNET = 2021
-
+        val WAKE_LOCK = 2019
     var activityService : MainActivityService? = null
 
     fun startService(){
@@ -52,10 +52,14 @@ class MainActivity : AppCompatActivity() {
         val b1 = checkPermission(Manifest.permission.INTERNET, REQUEST_INTERNET)
         val b2 = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_WRITE_EXTERNAL_STORAGE)
         val b3 = checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_READ_EXTERNAL_STORAGE)
+        val b4 = checkPermission(Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, REQUEST_IGNORE_BATTERY_OPT)
+        val b5 = checkPermission(Manifest.permission.WAKE_LOCK, WAKE_LOCK)
+
+
         if (b1 && b2 && b3){
             startService()
             if (activityService!!.isConnected()) {
-                activityService!!.refreshDirectories()
+                activityService!!.getDirectories()
                 setNewTextSummary()
             } else {
                 setNewTextError()
@@ -70,6 +74,15 @@ class MainActivity : AppCompatActivity() {
                 startActivityForResult(proto, 9998)
             }
         }
+        sync.setOnClickListener { view ->
+            if (activityService == null) startService()
+            if (activityService!!.isConnected()) {
+                val proto = Intent(this, ServerDirectoryChooserActivity::class.java)
+                proto.putStringArrayListExtra(ServerDirectoryChooserActivity.SEREVER_LABELS, ArrayList(activityService!!.getDirectories().filter { it -> it.value != null }.keys.map { it -> it.label }.toList()))
+                startActivityForResult(proto, 9997)
+            }
+        }
+
     }
 
     private fun setNewTextError() {
@@ -134,6 +147,17 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra(DriveJob.DIR_SERVER_PATH,elementAt.path)
                 startActivityForResult(intent,9999)
             }
+
+            9997 -> {
+                val stringExtra = data!!.getStringExtra(ServerDirectoryChooserActivity.LABEL_RESULT)
+                if (activityService == null){
+                    startService()
+                }
+                val elementAt = activityService!!.getDirectories().keys.filter { it -> it.label.equals(stringExtra) }.get(0)
+                if (elementAt != null){
+                    activityService!!.startJobOnlyOnce(elementAt)
+                }
+            }
         }
     }
 
@@ -151,6 +175,8 @@ class MainActivity : AppCompatActivity() {
         val directories = activityService!!.getDirectories()
         val mapped = activityService!!.getDirectories().filter { it -> it.value != null }.size
         summary.text = "Found: " + directories.keys.size + ", Mapped: " + mapped
+        val jobsScheduled = activityService!!.jobsScheduled()
+        scheduled.text = "Jobs Scheduled: " + jobsScheduled.toString()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

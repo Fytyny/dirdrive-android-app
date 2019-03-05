@@ -55,6 +55,16 @@
             app:srcCompat="@android:drawable/ic_input_add"/>
 
     <TextView
+            android:id="@+id/scheduled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="60dp"
+            android:textSize="15sp"
+            android:text="Job scheduled: ?J"
+            />
+
+    <TextView
             android:id="@+id/summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -71,4 +81,16 @@
             android:textSize="30sp"
             android:onClick="refreshOnClick"
             android:text="Refresh"/>
+
+    <android.support.design.widget.FloatingActionButton
+            android:id="@+id/sync"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_marginTop="750dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="10dp"
+
+            android:clickable="true"
+            app:srcCompat="@android:drawable/stat_notify_sync"
+            />
 </android.support.design.widget.CoordinatorLayout>

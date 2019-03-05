@@ -1,5 +1,6 @@
 package org.fytyny.dirdriveandroid.client
 
+import android.util.Log
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.fytyny.dirdriveandroid.annotation.Mockable
 import org.fytyny.dirdriveandroid.model.JsoupRequest
@@ -53,8 +54,13 @@ class SessionManagerImpl @Inject constructor() : SessionManager {
             }
         }
         val submit = executor.submit(c)
-        executor.shutdown();
-        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
-        return submit.get();
+        Log.i(this.javaClass.name, "Started " + url)
+
+     //   executor.shutdown();
+    //    executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOUR S);
+        val get = submit.get()
+        Log.i(this.javaClass.name, "Finished " + url + " " + (get != null))
+
+        return get;
     }
 }
