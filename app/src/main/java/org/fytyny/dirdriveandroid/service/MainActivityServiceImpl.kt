@@ -36,6 +36,13 @@ class MainActivityServiceImpl constructor(val mainActivity: MainActivity) : Main
 
     override fun isConnected() : Boolean{
         if (component == null) return false
+        else {
+            val contains = MainActivity.getCurrentSsid(mainActivity)?.contains("szyna")
+            if (contains == null  || !contains){
+                Log.i(javaClass.name, "Wifi was not found")
+                return false
+            }
+        }
         return component!!.getClient().establishConnection()
     }
 
@@ -100,16 +107,15 @@ class MainActivityServiceImpl constructor(val mainActivity: MainActivity) : Main
             persistableBundle.putString(DriveJob.DIR_SERVER_PATH, dir.path)
             persistableBundle.putString(DriveJob.DIR_LOCAL_PATH, path)
             val build = JobInfo.Builder(getIdOfDir(dir), componentName).setPeriodic(900)
-                     //  .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
                  // .setMinimumLatency(324)
                     .setPersisted(true)
                     .setExtras(persistableBundle)
                     .build()
             val schedule = jobScheduler.schedule(build)
             if (schedule == JobScheduler.RESULT_SUCCESS) {
-                Log.i("job", "Job scheduled!");
+                Log.i("job", "Job scheduled!")
             } else {
-                Log.i("job", "Job not scheduled");
+                Log.i("job", "Job not scheduled")
             }
         }
     }
@@ -117,19 +123,23 @@ class MainActivityServiceImpl constructor(val mainActivity: MainActivity) : Main
     override fun startJobOnlyOnce(dir: DirectoryDTO){
         val path = map?.get(dir)
         if (path != null) {
-            val driveJob = DriveJob()
-            val jobScheduler = mainActivity.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-            val componentName = ComponentName(mainActivity, DriveJob::class.java)
-            val persistableBundle: Bundle = Bundle()
 
-            persistableBundle.putString(DriveJob.DIR_SERVER_LABEL, dir.label)
-            persistableBundle.putString(DriveJob.DIR_SERVER_PATH, dir.path)
-            persistableBundle.putString(DriveJob.DIR_LOCAL_PATH, path)
+            val contains = MainActivity.getCurrentSsid(mainActivity)?.contains("szyna")
+            if (contains != null && contains) {
+                val driveJob = DriveJob()
+                val jobScheduler = mainActivity.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+                val componentName = ComponentName(mainActivity, DriveJob::class.java)
+                val persistableBundle: Bundle = Bundle()
 
-            val intent = Intent(mainActivity,DriveIntentJob::class.java)
-            intent.putExtras(persistableBundle)
-            ContextCompat.startForegroundService(mainActivity,intent)
-            DriveIntentJob.enqueue(this.mainActivity,intent,getIdOfDir(dir))
+                persistableBundle.putString(DriveJob.DIR_SERVER_LABEL, dir.label)
+                persistableBundle.putString(DriveJob.DIR_SERVER_PATH, dir.path)
+                persistableBundle.putString(DriveJob.DIR_LOCAL_PATH, path)
+
+                val intent = Intent(mainActivity, DriveIntentJob::class.java)
+                intent.putExtras(persistableBundle)
+                ContextCompat.startForegroundService(mainActivity, intent)
+                DriveIntentJob.enqueue(this.mainActivity, intent, getIdOfDir(dir))
+            }
         }
     }
 

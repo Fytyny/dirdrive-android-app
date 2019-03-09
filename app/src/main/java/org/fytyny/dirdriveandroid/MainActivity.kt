@@ -18,6 +18,7 @@ import javax.inject.Inject
 import android.content.Intent
 import android.util.Log
 import android.app.Activity
+import android.content.Context
 import android.content.IntentSender
 import android.os.Parcel
 import android.support.v4.provider.DocumentFile
@@ -27,6 +28,13 @@ import org.fytyny.dirdriveandroid.job.DriveJob
 import org.fytyny.dirdriveandroid.service.MainActivityService
 import org.fytyny.dirdriveandroid.service.MainActivityServiceImpl
 import java.net.URI
+import android.net.wifi.WifiInfo
+import android.content.Context.WIFI_SERVICE
+import android.net.wifi.WifiManager
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
+import android.content.Context.CONNECTIVITY_SERVICE
+import org.jsoup.helper.StringUtil
 
 
 class MainActivity : AppCompatActivity() {
@@ -35,8 +43,23 @@ class MainActivity : AppCompatActivity() {
         val REQUEST_WRITE_EXTERNAL_STORAGE = 2023
         val REQUEST_READ_EXTERNAL_STORAGE = 2022
         val REQUEST_IGNORE_BATTERY_OPT = 2020
-    }        val REQUEST_INTERNET = 2021
+        val REQUEST_INTERNET = 2021
         val WAKE_LOCK = 2019
+
+        fun getCurrentSsid(context: Context): String? {
+            var ssid: String? = null
+            val connManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkInfo = connManager.activeNetworkInfo
+            if (networkInfo != null && networkInfo.isConnected) {
+                val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                val connectionInfo = wifiManager.connectionInfo
+                if (connectionInfo != null && !StringUtil.isBlank(connectionInfo.ssid)) {
+                    ssid = connectionInfo.ssid
+                }
+            }
+            return ssid
+        }
+    }
     var activityService : MainActivityService? = null
 
     fun startService(){
@@ -87,6 +110,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setNewTextError() {
         summary.text = "Failed to establish connection"
+        val jobsScheduled = activityService!!.jobsScheduled()
+        scheduled.text = "Jobs Scheduled: " + jobsScheduled.toString()
     }
 
     fun checkPermission(permission : String, requestCode: Int) : Boolean{
@@ -199,4 +224,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+
 }

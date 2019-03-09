@@ -50,7 +50,10 @@ class DirDriveClientImpl @Inject constructor() : DirDriveClient{
 
     override fun establishConnection(): Boolean {
         try{
-            executor.connect("http://192.168.1.214:8080", JsoupRequest())
+            val request = JsoupRequest()
+            request.timeout = 2000
+            request.method = Connection.Method.TRACE
+            val connect = executor.connect("http://192.168.1.214:8080", request)
             return true
         }catch (e : ExecutionException){
             return false

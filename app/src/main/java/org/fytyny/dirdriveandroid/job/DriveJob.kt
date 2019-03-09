@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import org.fytyny.dirdrive.api.dto.DirectoryDTO
+import org.fytyny.dirdriveandroid.MainActivity
 import java.time.LocalDateTime
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -52,17 +53,22 @@ class DriveJob constructor(): JobService() {
         dir.label = extras!!.getString(DIR_SERVER_LABEL)
         val destinationPath = extras.getString(DIR_LOCAL_PATH)
 
-        val persistableBundle: Bundle = Bundle()
+        val contains = MainActivity.getCurrentSsid(this)?.contains("szyna")
+        if (contains != null && contains) {
+            val persistableBundle: Bundle = Bundle()
 
-        persistableBundle.putString(DriveJob.DIR_SERVER_LABEL, dir.label)
-        persistableBundle.putString(DriveJob.DIR_SERVER_PATH, dir.path)
-        persistableBundle.putString(DriveJob.DIR_LOCAL_PATH, destinationPath)
+            persistableBundle.putString(DriveJob.DIR_SERVER_LABEL, dir.label)
+            persistableBundle.putString(DriveJob.DIR_SERVER_PATH, dir.path)
+            persistableBundle.putString(DriveJob.DIR_LOCAL_PATH, destinationPath)
 
-        val intent = Intent(this,DriveIntentJob::class.java)
-        intent.putExtras(persistableBundle)
-        ContextCompat.startForegroundService(this,intent)
-        DriveIntentJob.enqueue(this,intent,params.jobId)
-        jobFinished(params,false)
+            val intent = Intent(this, DriveIntentJob::class.java)
+            intent.putExtras(persistableBundle)
+            ContextCompat.startForegroundService(this, intent)
+            DriveIntentJob.enqueue(this, intent, params.jobId + 9999)
+        }else {
+            Log.i(javaClass.name, "Wifi was not found")
+        }
+        jobFinished(params, false)
 
         return true
     }

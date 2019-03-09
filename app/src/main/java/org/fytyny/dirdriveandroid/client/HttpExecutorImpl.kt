@@ -20,7 +20,9 @@ class HttpExecutorImpl @Inject constructor() : HttpExecutor{
 
     override @Synchronized
     fun connect(url: String, request: Connection.Request): Connection.Response {
-        request.headers().put(X_SESSION_TOKEN, sessionManager.getSession()?.token)
+        if (!request.method().equals(Connection.Method.TRACE)){
+            request.headers().put(X_SESSION_TOKEN, sessionManager.getSession()?.token)
+        }
         val executor = Executors.newSingleThreadExecutor()
         val c: Callable<Connection.Response> = object : Callable<Connection.Response> {
             override fun call(): Connection.Response {
@@ -38,8 +40,6 @@ class HttpExecutorImpl @Inject constructor() : HttpExecutor{
         }
         Log.i(this.javaClass.name, "Started " + url)
         val submit = executor.submit(c)
-   //     executor.shutdown();
- //       executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
 
          val get = submit.get()
         Log.i(this.javaClass.name, "Finished " + url + " " + (get != null))

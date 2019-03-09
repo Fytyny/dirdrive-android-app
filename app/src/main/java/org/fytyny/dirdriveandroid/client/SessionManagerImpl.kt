@@ -29,6 +29,7 @@ class SessionManagerImpl @Inject constructor() : SessionManager {
         request.method = Connection.Method.GET;
         request.headers = HashMap()
         request.headers.put(X_API_KEY,"superapikey")
+        request.timeout = 2000
         val response = getSession(url, request)
         val readTree = mapper.readTree(response.body())
         if (readTree.has("token")){
