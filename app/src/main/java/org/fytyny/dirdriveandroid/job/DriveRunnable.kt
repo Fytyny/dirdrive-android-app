@@ -57,8 +57,7 @@ class DriveRunnable (val source : DirectoryDTO,  val destinationPath : String, v
 
     override fun run() {
         logging.log("Job started");
-        logging.log("Job started");
-        component = DaggerDefaultComponent.create();
+        component = DaggerDefaultComponent.create()
         val client = component!!.getClient()
         if (!client.establishConnection()){
             logging.log("Could not establish connection")
