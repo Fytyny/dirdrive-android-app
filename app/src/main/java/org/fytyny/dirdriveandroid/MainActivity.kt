@@ -40,6 +40,11 @@ import org.jsoup.helper.StringUtil
 class MainActivity : AppCompatActivity() {
 
     companion object {
+        val REQUEST_ACCESS_WIFI_STATE = 2026
+        val REQUEST_ACCESS_NETWORK_STATE = 2027
+
+        val REQUEST_ACCESS_COARSE_LOCATION = 2025
+        val REQUEST_ACCESS_FINE_LOCATION = 2024
         val REQUEST_WRITE_EXTERNAL_STORAGE = 2023
         val REQUEST_READ_EXTERNAL_STORAGE = 2022
         val REQUEST_IGNORE_BATTERY_OPT = 2020
@@ -75,8 +80,7 @@ class MainActivity : AppCompatActivity() {
         val b1 = checkPermission(Manifest.permission.INTERNET, REQUEST_INTERNET)
         val b2 = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_WRITE_EXTERNAL_STORAGE)
         val b3 = checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_READ_EXTERNAL_STORAGE)
-        val b4 = checkPermission(Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, REQUEST_IGNORE_BATTERY_OPT)
-        val b5 = checkPermission(Manifest.permission.WAKE_LOCK, WAKE_LOCK)
+        checkRest()
 
 
         if (b1 && b2 && b3){
@@ -106,6 +110,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    private fun checkRest()
+    {
+        val b4 = checkPermission(Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, REQUEST_IGNORE_BATTERY_OPT)
+        val b5 = checkPermission(Manifest.permission.WAKE_LOCK, WAKE_LOCK)
+        val b6 = checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, REQUEST_ACCESS_FINE_LOCATION)
+        val b7 = checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, REQUEST_ACCESS_COARSE_LOCATION)
+        val b8 = checkPermission(Manifest.permission.ACCESS_WIFI_STATE, REQUEST_ACCESS_WIFI_STATE)
+        val b9 = checkPermission(Manifest.permission.ACCESS_NETWORK_STATE, REQUEST_ACCESS_NETWORK_STATE)
     }
 
     private fun setNewTextError() {
@@ -187,6 +201,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun refreshOnClick(v : View){
+        checkRest()
         if(activityService == null) startService()
         if (activityService!!.isConnected()) {
             activityService!!.refreshDirectories()

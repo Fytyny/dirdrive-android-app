@@ -53,7 +53,8 @@ class DriveJob constructor(): JobService() {
         dir.label = extras!!.getString(DIR_SERVER_LABEL)
         val destinationPath = extras.getString(DIR_LOCAL_PATH)
 
-        val contains = MainActivity.getCurrentSsid(this)?.contains("szyna")
+        val currentSsid = MainActivity.getCurrentSsid(this)?.toLowerCase()
+        val contains = currentSsid?.contains("szyna")
         if (contains != null && contains) {
             val persistableBundle: Bundle = Bundle()
 

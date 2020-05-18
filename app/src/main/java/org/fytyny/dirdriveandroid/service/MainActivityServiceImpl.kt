@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import android.widget.Toast
 import org.fytyny.dirdrive.api.dto.DirectoryDTO
 import org.fytyny.dirdriveandroid.MainActivity
 import org.fytyny.dirdriveandroid.annotation.Mockable
@@ -37,9 +38,13 @@ class MainActivityServiceImpl constructor(val mainActivity: MainActivity) : Main
     override fun isConnected() : Boolean{
         if (component == null) return false
         else {
-            val contains = MainActivity.getCurrentSsid(mainActivity)?.contains("szyna")
-            if (contains == null  || !contains){
+            val currentSsid = MainActivity.getCurrentSsid(mainActivity)?.toLowerCase()
+            val contains = currentSsid?.contains("szyna")
+            val test =     currentSsid?.contains("androidwifi")
+
+            if ((contains != null  && !contains ) && (test != null && !test)){
                 Log.i(javaClass.name, "Wifi was not found")
+                Toast.makeText(mainActivity.applicationContext,"Cannot find your network. Please make sure location services are turned on!",Toast.LENGTH_LONG).show()
                 return false
             }
         }
@@ -124,8 +129,11 @@ class MainActivityServiceImpl constructor(val mainActivity: MainActivity) : Main
         val path = map?.get(dir)
         if (path != null) {
 
-            val contains = MainActivity.getCurrentSsid(mainActivity)?.contains("szyna")
-            if (contains != null && contains) {
+            val currentSsid = MainActivity.getCurrentSsid(mainActivity)?.toLowerCase()
+            val contains = currentSsid?.contains("szyna")
+            val test =     currentSsid?.contains("AndroidWifi")
+
+            if ((contains != null && contains) || (test != null && test)) {
                 val driveJob = DriveJob()
                 val jobScheduler = mainActivity.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
                 val componentName = ComponentName(mainActivity, DriveJob::class.java)
@@ -138,7 +146,8 @@ class MainActivityServiceImpl constructor(val mainActivity: MainActivity) : Main
                 val intent = Intent(mainActivity, DriveIntentJob::class.java)
                 intent.putExtras(persistableBundle)
                 ContextCompat.startForegroundService(mainActivity, intent)
-                DriveIntentJob.enqueue(this.mainActivity, intent, getIdOfDir(dir))
+                DriveIntentJob.enqueue(this.mainActivity, intent, getIdOfDir(dir) or 4096)
+                val t = true
             }
         }
     }

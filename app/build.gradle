@@ -41,7 +41,9 @@ allOpen {
 }
 
 repositories {
-    mavenLocal()
+    maven {
+        url uri('M:\\MavenRepo\\repository')
+    }
 }
 dependencies {
     compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'

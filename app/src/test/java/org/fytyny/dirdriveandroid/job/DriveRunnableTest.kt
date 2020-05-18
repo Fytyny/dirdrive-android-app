@@ -5,6 +5,7 @@ import org.fytyny.dirdrive.api.dto.FileDTO
 import org.junit.Assert
 import org.junit.Test
 import java.io.File
+import java.util.logging.Logger
 
 class DriveRunnableTest {
 
@@ -27,7 +28,7 @@ class DriveRunnableTest {
         dir.path = "E:\\Muzyka\\Yt-Music"
         val file = File("D:\\windows 10 new\\Pulpit\\afsef")
 
-        val drive : DriveRunnable = DriveRunnable(dir, file.absolutePath)
+        val drive : DriveRunnable = DriveRunnable(dir, file.absolutePath, LogDriveJobLogging())
         drive.run()
     }
 }
